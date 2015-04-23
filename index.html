@@ -9,7 +9,8 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
 
   <style type="text/css">
-    canvas { border: solid 1px #fcc; }
+    h1 { color: #073642; }
+    canvas { background-color: #073642; }
   </style>
 </head>
 <body>
@@ -20,12 +21,14 @@
 
   <script src="js/life.js"></script>
   <script>
-    var life = Life.create(600, 450, 10);
+    var life = Life.create(600, 450, 5);
     document.getElementById('life').appendChild(life);
-    //Life.put('blinker', 30, 22);
     Life.put('glider', 13, 1);
     Life.put('gosper', 22, 5);
     Life.put('gosper', 5, 22);
+    Life.put('gosper', 78, 45);
+    Life.put('gosper', 73, 10);
+
     Life.start();
   </script>
 </body>

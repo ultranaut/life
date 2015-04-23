@@ -4,7 +4,7 @@ var Life = (function () {
 
   var LINEOFFSET = 0;
   var GRID_COLOR = '#ddd';
-  var CELL_COLOR = '#900';
+  var CELL_COLOR = '#b58900';
 
   var _width;
   var _height;
