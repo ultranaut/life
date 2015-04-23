@@ -2,35 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title></title>
+  <title>Life</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
 
   <style type="text/css">
     h1 { color: #073642; }
-    canvas { background-color: #073642; }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Life</h1>
+    <div class="options">
+      <label class="checkbox-inline">
+        <input type="checkbox" id="showGraves" value="true">Show graves
+      </label>
+    </div>
     <div id="life"></div>
+    <div id="controls">
+      <button type="button" class="btn btn-success" id="startBtn">Start</button>
+    </div>
   </div>
 
   <script src="js/life.js"></script>
-  <script>
-    var life = Life.create(600, 450, 5, '#b58900');
-    document.getElementById('life').appendChild(life);
-    Life.put('glider', 13, 1);
-    Life.put('gosper', 22, 5);
-    Life.put('gosper', 5, 22);
-    Life.put('gosper', 78, 45);
-    Life.put('gosper', 73, 10);
-    Life.put('pulsar', 10, 67);
-
-    Life.start();
-  </script>
+  <script src="js/main.js"></script>
 </body>
 </html>

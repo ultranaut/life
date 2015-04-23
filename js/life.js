@@ -18,8 +18,10 @@ var Life = (function () {
   var _canvas;            // HTML canvas object
   var _context;           // context of canvas object
   var _cellColor;         // color of living cell
+  var _canvasColor;       // color of blank canvas
   var _generation = 50;   // lifetime of  a generation in milliseconds
   var _patterns = {};     // a library of patterns
+  var _intervalId = null; // interval id of generate function
 
   /**
    * Create a canvas object.
@@ -30,12 +32,13 @@ var Life = (function () {
    * @param {string} color  - Color to use for living cells.
    * @returns {Node} An HTML canvas node
    */
-  function create(width, height, cell, color) {
+  function create(width, height, cell, cellColor, canvasColor) {
     // set namespace variables
     _width  = width / cell;
     _height = height / cell;
     _cell  = cell;
-    _cellColor = (typeof color === 'undefined') ? '#000' : color;
+    _cellColor = (typeof cellColor === 'undefined') ? '#000' : cellColor;
+    _canvasColor = (typeof canvasColor === 'undefined') ? '#fff' : canvasColor;
 
     // create an HTML canvas element; note we're using the args
     //   values here still since they're in pixels.
@@ -44,33 +47,12 @@ var Life = (function () {
     canvas.height = height;
     _canvas = canvas;
     _context = canvas.getContext('2d');
-    _context.fillStyle = color;
-
-    // set namespace variables
-    _width  = width / cell;
-    _height = height / cell;
-    _cell  = cell;
-    _cellColor = (typeof color === 'undefined') ? '#000' : color;
+    _context.fillStyle = _canvasColor;
+    _context.fillRect(0, 0, 600, 450);
+    _context.fillStyle = _cellColor;
 
     _initializeMatrix();
-
     return _canvas;
-  }
-
-  /*
-   * Create the cell matrix.
-   *
-   * Sets _matrix to an n x m array with all values initialized to 0
-   */
-  function _initializeMatrix() {
-    var row = [];
-    var i;
-    for (i = 0; i < _width; i++) {
-      row[i] = 0;
-    }
-    for (i = 0; i < _height; i++) {
-      _matrix[i] = row.slice(0);
-    }
   }
 
   /**
@@ -93,43 +75,67 @@ var Life = (function () {
     _draw();
   }
 
-  /*
-   * Translate _matrix onto the _canvas.
-   */
-  function _draw() {
-    var x, y;
-    for (var row = 0; row < _height; row++) {
-      for (var col = 0; col < _width; col++) {
-        x = col * _cell;
-        y = row * _cell;
-        if (_matrix[row][col] === 1) {
-          _context.fillRect(x, y, _cell, _cell);
-        }
-        else {
-          _context.clearRect(x, y, _cell, _cell);
-
-        }
-      }
-    }
-  }
-
-  /*
-   * Produce a clone of the _matrix.
-   */
-  function _clone() {
-    var retval = [];
-    for (var i = 0; i < _matrix.length; i++) {
-      // retval[i] = _matrix[i].slice(0);
-      retval[i] = _matrix[i].slice(0);
-    }
-    return retval;
-  }
-
   /**
    * Start iterating generations.
    */
   function start() {
-    setInterval(_generate, _generation);
+    _intervalId = setInterval(_generate, _generation);
+  }
+
+  /**
+   * Stop iterating generations.
+   */
+  function stop() {
+    clearInterval(_intervalId);
+    _intervalId = null;
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  function isRunning() {
+    return _intervalId !== null;
+  }
+
+  /*
+   * Create the cell matrix.
+   *
+   * Sets _matrix to an n x m array with all values initialized to 0
+   */
+  function _initializeMatrix() {
+    var i;
+    // create a row of _width 0's
+    var row = [];
+    for (i = 0; i < _width; i++) {
+      row[i] = 0;
+    }
+    // insert _height number of rows into _matrix
+    for (i = 0; i < _height; i++) {
+      _matrix[i] = row.slice(0);
+    }
+  }
+
+  /*
+   * Translate _matrix onto the _canvas.
+   */
+  function _draw() {
+    var x, y, currentValue;
+    for (var row = 0; row < _height; row++) {
+      for (var col = 0; col < _width; col++) {
+        x = col * _cell;
+        y = row * _cell;
+        currentValue = _matrix[row][col];
+        if (currentValue === 1) {
+          _context.fillRect(x, y, _cell, _cell);
+        }
+        // if we're turning off a cell that's alive, then clear that
+        //   cell's rectangle, and set the cell's value to 0
+        else if (currentValue === -1) {
+          _context.clearRect(x, y, _cell, _cell);
+          _matrix[row][col] = 0;
+        }
+      }
+    }
   }
 
   /*
@@ -137,15 +143,17 @@ var Life = (function () {
    */
   function _generate() {
     var row, col, neighbors;
-    var nextGen = _clone();
+    var nextGen = _cloneMatrix();
 
     for (row = 0; row < _height; row++) {
       for (col = 0; col < _width; col++) {
-        neighbors = _neighbors(row, col);
+        neighbors = _countNeighbors(row, col);
 
         if (_matrix[row][col] === 1) {
+          // if it's a living cell that's going to die, then mark it
+          //   to be cleared for _draw
           if (neighbors < 2 || neighbors > 3) {
-            nextGen[row][col] = 0;
+            nextGen[row][col] = -1;
           }
         }
         else if (neighbors === 3) {
@@ -158,9 +166,20 @@ var Life = (function () {
   }
 
   /*
+   * Produce a clone of the _matrix.
+   */
+  function _cloneMatrix() {
+    var retval = [];
+    for (var i = 0; i < _matrix.length; i++) {
+      retval[i] = _matrix[i].slice(0);
+    }
+    return retval;
+  }
+
+  /*
    * Count the number of neighbors;
    */
-  function _neighbors(row, col) {
+  function _countNeighbors(row, col) {
     // Don't want to count the current cell itself.
     var pop = 0 - _matrix[row][col];
     var i, j;
@@ -220,6 +239,8 @@ var Life = (function () {
     create: create,
     put: put,
     start: start,
+    stop: stop,
+    isRunning: isRunning
   };
 }());
 
