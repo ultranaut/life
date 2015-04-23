@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+
+  <style type="text/css">
+    canvas { border: solid 1px #fcc; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Life</h1>
+    <div id="life"></div>
+  </div>
+
+  <script src="js/life.js"></script>
+  <script>
+    var life = Life.create(600, 450, 10);
+    document.getElementById('life').appendChild(life);
+    //Life.put('blinker', 30, 22);
+    Life.put('glider', 13, 1);
+    Life.put('gosper', 22, 5);
+    Life.put('gosper', 5, 22);
+    Life.start();
+  </script>
+</body>
+</html>
