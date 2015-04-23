@@ -41,10 +41,6 @@ var Life = (function () {
     }
   }
 
-  function attach(el) {
-    el.appendChild(_canvas);
-  }
-
   function put(pattern, x, y) {
     var schema = _patterns[pattern];
     var height = schema.length;
@@ -154,7 +150,6 @@ var Life = (function () {
 
   return {
     create: create,
-    attach: attach,
     put: put,
     start: start,
 
