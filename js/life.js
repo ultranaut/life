@@ -2,8 +2,6 @@
 var Life = (function () {
   'use strict';
 
-  var LINEOFFSET = 0;
-  var GRID_COLOR = '#ddd';
   var CELL_COLOR = '#b58900';
 
   var _width;
@@ -27,26 +25,9 @@ var Life = (function () {
     _context = canvas.getContext('2d');
     _context.fillStyle = CELL_COLOR;
 
-    _drawGrid();
     _initializeMatrix();
 
     return canvas;
-  }
-
-  function _drawGrid() {
-    var i;
-    _context.strokeStyle = GRID_COLOR;
-    for (i = 0; i * _scale <= _height; i++) {
-      var y = i * _scale + LINEOFFSET;
-      _context.moveTo(0, y);
-      _context.lineTo(_width, y);
-    }
-    for (i = 0; i * _scale <= _width; i++) {
-      var x = i * _scale + LINEOFFSET;
-      _context.moveTo(x, 0);
-      _context.lineTo(x, _height);
-    }
-    _context.stroke();
   }
 
   function _initializeMatrix() {
