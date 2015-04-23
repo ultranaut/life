@@ -50,6 +50,11 @@ var Life = (function () {
     return canvas;
   }
 
+  /*
+   * Create the cell matrix.
+   *
+   * Sets _matrix to an n x m array with all values initialized to 0
+   */
   function _initializeMatrix() {
     var n = _height / _cell;
     var m = _width / _cell;
@@ -81,6 +86,9 @@ var Life = (function () {
     _draw();
   }
 
+  /*
+   * Translate _matrix onto the _canvas.
+   */
   function _draw() {
     var x, y;
     var height = _matrix.length;
@@ -100,6 +108,9 @@ var Life = (function () {
     }
   }
 
+  /*
+   * Produce a clone of the _matrix.
+   */
   function _clone() {
     var retval = [];
     for (var i = 0; i < _matrix.length; i++) {
@@ -116,7 +127,9 @@ var Life = (function () {
     setInterval(_generate, _generation);
   }
 
-
+  /*
+   * Compute the next generation.
+   */
   function _generate() {
     var row, col, neighbors;
     var height = _matrix.length;
@@ -141,6 +154,9 @@ var Life = (function () {
     _draw();
   }
 
+  /*
+   * Count the number of neighbors;
+   */
   function _neighbors(row, col) {
     // var pop = 0 - _matrix[row][col];
     var pop = 0;
@@ -160,6 +176,9 @@ var Life = (function () {
     return pop;
   }
 
+  /*
+   * Some standard patterns.
+   */
   var _patterns = {
     blinker: [[ 1, 1, 1 ]],
 
@@ -178,6 +197,9 @@ var Life = (function () {
              [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
   };
 
+  /*
+   * Expose the public API.
+   */
   return {
     create: create,
     put: put,
