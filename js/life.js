@@ -1,21 +1,41 @@
+/**
+ * Conway's Game of Life
+ *
+ * Just for fun and to play around with stuff that I haven't made
+ * much use of.
+ */
 
+/**
+ * @namespace
+ */
 var Life = (function () {
   'use strict';
 
+  /**
+   * @const {string} CELL_COLOR - The color of a "live" cell.
+   */
   var CELL_COLOR = '#b58900';
 
   var _width;
   var _height;
-  var _scale;
+  var _cell;
   var _matrix = [];
   var _canvas;
   var _context;
   var _generation = 50;
 
-  function create(w, h, s) {
-    _width  = w;
-    _height = h;
-    _scale  = s;
+  /**
+   * Create a canvas object.
+   *
+   * @param {number} width - The width of the canvas.
+   * @param {number} height - The height of the canvas.
+   * @param {number} cell - The size of a cell.
+   * @returns {object}
+   */
+  function create(width, height, cell) {
+    _width  = width;
+    _height = height;
+    _cell  = cell;
 
     var canvas = document.createElement('canvas');
     canvas.width = _width;
@@ -31,8 +51,8 @@ var Life = (function () {
   }
 
   function _initializeMatrix() {
-    var n = _height / _scale;
-    var m = _width / _scale;
+    var n = _height / _cell;
+    var m = _width / _cell;
     for (var i = 0; i < n; i++) {
       _matrix[i] = [];
       for (var j = 0; j < m; j++) {
@@ -41,6 +61,13 @@ var Life = (function () {
     }
   }
 
+  /**
+   * Place an object on the grid
+   *
+   * @param {string} pattern - Key of pattern to use.
+   * @param {number} x - The x-coordinate of the placement.
+   * @param {number} y - The y-coordinate of the placement.
+   */
   function put(pattern, x, y) {
     var schema = _patterns[pattern];
     var height = schema.length;
@@ -60,13 +87,13 @@ var Life = (function () {
     var width = _matrix[0].length;
     for (var row = 0; row < height; row++) {
       for (var col = 0; col < width; col++) {
-        x = col * _scale;
-        y = row * _scale;
+        x = col * _cell;
+        y = row * _cell;
         if (_matrix[row][col] === 1) {
-          _context.fillRect(x, y, _scale, _scale);
+          _context.fillRect(x, y, _cell, _cell);
         }
         else {
-          _context.clearRect(x, y, _scale, _scale);
+          _context.clearRect(x, y, _cell, _cell);
 
         }
       }
@@ -82,6 +109,9 @@ var Life = (function () {
     return retval;
   }
 
+  /**
+   * Start iterating generations.
+   */
   function start() {
     setInterval(_generate, _generation);
   }
@@ -152,15 +182,6 @@ var Life = (function () {
     create: create,
     put: put,
     start: start,
-
-    /* for debugging...
-    canvas: _canvas,
-    context: _context,
-    matrix: _matrix,
-    clone: _clone,
-    generate: _generate,
-    */
-
   };
 }());
 
