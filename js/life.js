@@ -11,45 +11,50 @@
 var Life = (function () {
   'use strict';
 
-  /**
-   * @const {string} CELL_COLOR - The color of a "live" cell.
-   */
-  var CELL_COLOR = '#b58900';
-
-  var _width;
+  var _width;             // width and height of grid in cells
   var _height;
-  var _cell;
-  var _matrix = [];
-  var _canvas;
-  var _context;
-  var _generation = 50;
-
-  var _patterns = {};
+  var _cell;              // size of cells in pixels
+  var _matrix = [];       // matrix of cell states
+  var _canvas;            // HTML canvas object
+  var _context;           // context of canvas object
+  var _cellColor;         // color of living cell
+  var _generation = 50;   // lifetime of  a generation in milliseconds
+  var _patterns = {};     // a library of patterns
 
   /**
    * Create a canvas object.
    *
-   * @param {number} width - The width of the canvas.
-   * @param {number} height - The height of the canvas.
-   * @param {number} cell - The size of a cell.
-   * @returns {object}
+   * @param {number} width  - The width of the canvas in pixels.
+   * @param {number} height - The height of the canvas in pixels.
+   * @param {number} cell   - The size of a cell in pixels.
+   * @param {string} color  - Color to use for living cells.
+   * @returns {Node} An HTML canvas node
    */
-  function create(width, height, cell) {
-    _width  = width;
-    _height = height;
+  function create(width, height, cell, color) {
+    // set namespace variables
+    _width  = width / cell;
+    _height = height / cell;
     _cell  = cell;
+    _cellColor = (typeof color === 'undefined') ? '#000' : color;
 
+    // create an HTML canvas element; note we're using the args
+    //   values here still since they're in pixels.
     var canvas = document.createElement('canvas');
-    canvas.width = _width;
-    canvas.height = _height;
-
+    canvas.width = width;
+    canvas.height = height;
     _canvas = canvas;
     _context = canvas.getContext('2d');
-    _context.fillStyle = CELL_COLOR;
+    _context.fillStyle = color;
+
+    // set namespace variables
+    _width  = width / cell;
+    _height = height / cell;
+    _cell  = cell;
+    _cellColor = (typeof color === 'undefined') ? '#000' : color;
 
     _initializeMatrix();
 
-    return canvas;
+    return _canvas;
   }
 
   /*
@@ -58,13 +63,13 @@ var Life = (function () {
    * Sets _matrix to an n x m array with all values initialized to 0
    */
   function _initializeMatrix() {
-    var n = _height / _cell;
-    var m = _width / _cell;
-    for (var i = 0; i < n; i++) {
-      _matrix[i] = [];
-      for (var j = 0; j < m; j++) {
-        _matrix[i][j] = 0;
-      }
+    var row = [];
+    var i;
+    for (i = 0; i < _width; i++) {
+      row[i] = 0;
+    }
+    for (i = 0; i < _height; i++) {
+      _matrix[i] = row.slice(0);
     }
   }
 
@@ -93,10 +98,8 @@ var Life = (function () {
    */
   function _draw() {
     var x, y;
-    var height = _matrix.length;
-    var width = _matrix[0].length;
-    for (var row = 0; row < height; row++) {
-      for (var col = 0; col < width; col++) {
+    for (var row = 0; row < _height; row++) {
+      for (var col = 0; col < _width; col++) {
         x = col * _cell;
         y = row * _cell;
         if (_matrix[row][col] === 1) {
@@ -134,12 +137,10 @@ var Life = (function () {
    */
   function _generate() {
     var row, col, neighbors;
-    var height = _matrix.length;
-    var width = _matrix[0].length;
     var nextGen = _clone();
 
-    for (row = 0; row < height; row++) {
-      for (col = 0; col < width; col++) {
+    for (row = 0; row < _height; row++) {
+      for (col = 0; col < _width; col++) {
         neighbors = _neighbors(row, col);
 
         if (_matrix[row][col] === 1) {
@@ -177,6 +178,7 @@ var Life = (function () {
 
   /*
    * Some standard patterns.
+   * TODO add more
    */
   _patterns.blinker = [[ 1, 1, 1 ]];
   _patterns.pulsar = [
