@@ -158,17 +158,14 @@ var Life = (function () {
    * Count the number of neighbors;
    */
   function _neighbors(row, col) {
-    // var pop = 0 - _matrix[row][col];
-    var pop = 0;
+    // Don't want to count the current cell itself.
+    var pop = 0 - _matrix[row][col];
     var i, j;
 
     for (i = -1; i < 2; i++) {
       for (j = -1; j < 2; j++) {
         if (typeof _matrix[row+i] !== 'undefined' &&
             typeof _matrix[row+i][col+j] !== 'undefined') {
-          if (j === 0 && i === 0) {
-            continue;
-          }
           pop += _matrix[row+i][col+j];
         }
       }
