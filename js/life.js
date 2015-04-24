@@ -16,8 +16,8 @@ function Life(width, height, cell) {
   this.generation = 50;        // lifetime of  a generation in milliseconds
   this.intervalId = null;      // interval id of tick function
 
-  this.cellColor = '#b58900';
-  this.canvasColor = '#073642';
+  this.cellColor = '#000';
+  this.canvasColor = '#fff';
 
   // create an HTML canvas element; note we're using the args
   //   values here still since they're in pixels.
@@ -26,11 +26,8 @@ function Life(width, height, cell) {
   this.canvas.height = height;
   this.context = this.canvas.getContext('2d');
 
-  // TODO this should happen elsewhere
-  this.context.fillStyle = this.canvasColor;
-  this.context.fillRect(0, 0, 600, 450);
-  this.context.fillStyle = this.cellColor;
 
+  this.fillCanvas();
   this.initializeMatrix();
 }
 
@@ -85,6 +82,7 @@ Life.prototype.draw = function () {
       y = n * cell;
       currentValue = matrix[n][m];
       if (currentValue === 1) {
+        context.fillStyle = this.cellColor;
         context.fillRect(x, y, cell, cell);
       }
       // if we're turning off a cell that's alive, then clear that
@@ -154,11 +152,22 @@ Life.prototype.countNeighbors = function (row, col) {
   return pop;
 };
 
+Life.prototype.setColor = function (el, color) {
+  this[el] =  color;
+  if (el === 'canvasColor') {
+    this.fillCanvas();
+  }
+};
+
+Life.prototype.fillCanvas = function () {
+  this.context.fillStyle = this.canvasColor;
+  this.context.fillRect(0, 0, 600, 450);
+};
+
 /**
  * Start ticking generations.
  */
 Life.prototype.start = function () {
-  console.log(this);
   this.intervalId = setInterval(this.tick.bind(this), this.generation);
 };
 

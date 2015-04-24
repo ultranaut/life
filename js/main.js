@@ -5,6 +5,8 @@ var canvasColor = '#073642';
 
 var game = new Life(600, 450, 5);
 game.canvas.style.backgroundColor = this.checked ? graveColor : canvasColor;
+game.setColor('cellColor', cellColor);
+game.setColor('canvasColor', canvasColor);
 game.place('glider', 13, 1);
 game.place('gosper', 22, 5);
 game.place('gosper', 5, 22);
