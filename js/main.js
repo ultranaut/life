@@ -17,10 +17,12 @@ document.getElementById('life').appendChild(game.canvas);
 game.canvas.style.backgroundColor = canvasColor;
 
 document.getElementById('showGraves').onchange = function (e) {
+  'use strict';
   game.canvas.style.backgroundColor = this.checked ? graveColor : canvasColor;
 };
 
 document.getElementById('startBtn').onclick = function () {
+  'use strict';
   if (!game.isRunning()) {
     game.start();
     this.className = 'btn btn-danger';

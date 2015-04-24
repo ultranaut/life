@@ -1,4 +1,6 @@
 var Life = (function () {
+  'use strict';
+
   /**
    * Creates a Game of Life object.
    * @class
