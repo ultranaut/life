@@ -15,7 +15,7 @@ var Life = (function () {
     this.cell = cell;            // size of cells in pixels
     this.matrix = [];            // matrix of cell states
     this.generation = 50;        // lifetime of  a generation in milliseconds
-    this.intervalId = null;      // interval id of tick function
+    this.intervalId = null;      // interval id of _tick function
 
     this.cellColor = '#000';
     this.canvasColor = '#fff';
@@ -28,8 +28,8 @@ var Life = (function () {
     this.context = this.canvas.getContext('2d');
 
 
-    fillCanvas.call(this);
-    initializeMatrix.call(this);
+    _fillCanvas.call(this);
+    _initializeMatrix.call(this);
   }
 
   /* ********************** Public methods ************************* */
@@ -49,21 +49,21 @@ var Life = (function () {
         this.matrix[n+y][m+x] = schema[n][m];
       }
     }
-    draw.call(this);
+    _draw.call(this);
   };
 
   Life.prototype.setColor = function (el, color) {
     this[el] =  color;
     if (el === 'canvasColor') {
-      fillCanvas.call(this);
+      _fillCanvas.call(this);
     }
   };
 
   /**
-   * Start ticking generations.
+   * Start _ticking generations.
    */
   Life.prototype.start = function () {
-    this.intervalId = setInterval(tick.bind(this), this.generation);
+    this.intervalId = setInterval(_tick.bind(this), this.generation);
   };
 
   /**
@@ -88,7 +88,7 @@ var Life = (function () {
    *
    * Sets _matrix to an n x m array with all values initialized to 0
    */
-  var initializeMatrix = function () {
+  var _initializeMatrix = function () {
     var i;
     // create a row of _width 0's
     var row = [];
@@ -104,7 +104,7 @@ var Life = (function () {
   /*
    * Translate matrix onto the canvas.
    */
-  var draw = function () {
+  var _draw = function () {
     var m, n, x, y, currentValue;
     var cell = this.cell;
     var matrix = this.matrix;
@@ -132,17 +132,17 @@ var Life = (function () {
   /*
    * Compute the next generation.
    */
-  var tick = function () {
+  var _tick = function () {
     var n, m, neighbors;
-    var nextGen = cloneMatrix.call(this);
+    var nextGen = _cloneMatrix.call(this);
 
     for (n = 0; n < this.height; n++) {
       for (m = 0; m < this.width; m++) {
-        neighbors = countNeighbors.call(this, n, m);
+        neighbors = _countNeighbors.call(this, n, m);
 
         if (this.matrix[n][m] === 1) {
           // if it's a living cell that's going to die, then mark it
-          //   to be cleared for draw()
+          //   to be cleared for _draw()
           if (neighbors < 2 || neighbors > 3) {
             nextGen[n][m] = -1;
           }
@@ -153,13 +153,13 @@ var Life = (function () {
       }
     }
     this.matrix = nextGen;
-    draw.call(this);
+    _draw.call(this);
   };
 
   /*
    * Produce a clone of the _matrix.
    */
-  var cloneMatrix = function () {
+  var _cloneMatrix = function () {
     var retval = [];
     for (var i = 0; i < this.matrix.length; i++) {
       retval[i] = this.matrix[i].slice(0);
@@ -170,7 +170,7 @@ var Life = (function () {
   /*
    * Count the number of neighbors;
    */
-  var countNeighbors = function (row, col) {
+  var _countNeighbors = function (row, col) {
     // Don't want to count the current cell itself.
     var pop = 0 - this.matrix[row][col];
     var i, j;
@@ -186,7 +186,7 @@ var Life = (function () {
     return pop;
   };
 
-  var fillCanvas = function () {
+  var _fillCanvas = function () {
     this.context.fillStyle = this.canvasColor;
     this.context.fillRect(0, 0, 600, 450);
   };
