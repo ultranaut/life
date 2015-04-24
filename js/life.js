@@ -1,246 +1,215 @@
 /**
- * Conway's Game of Life
- *
- * Just for fun and to play around with stuff that I haven't made
- * much use of.
+ * Creates a Game of Life object.
+ * @class
+ * @param {number} width  - The width of the canvas in pixels.
+ * @param {number} height - The height of the canvas in pixels.
+ * @param {number} cell   - The size of a cell in pixels.
+ * @returns {Node} An HTML canvas node
  */
+function Life(width, height, cell) {
+  var self = this;
+  // set instance properties
+  this.width = width / cell;   // width and height of grid in cells
+  this.height = height / cell;
+  this.cell = cell;            // size of cells in pixels
+  this.matrix = [];            // matrix of cell states
+  this.generation = 50;        // lifetime of  a generation in milliseconds
+  this.intervalId = null;      // interval id of tick function
+
+  this.cellColor = '#b58900';
+  this.canvasColor = '#073642';
+
+  // create an HTML canvas element; note we're using the args
+  //   values here still since they're in pixels.
+  this.canvas = document.createElement('canvas');
+  this.canvas.width = width;
+  this.canvas.height = height;
+  this.context = this.canvas.getContext('2d');
+
+  // TODO this should happen elsewhere
+  this.context.fillStyle = this.canvasColor;
+  this.context.fillRect(0, 0, 600, 450);
+  this.context.fillStyle = this.cellColor;
+
+  this.initializeMatrix();
+}
+
+/*
+ * Create the cell matrix.
+ *
+ * Sets _matrix to an n x m array with all values initialized to 0
+ */
+Life.prototype.initializeMatrix = function () {
+  var i;
+  // create a row of _width 0's
+  var row = [];
+  for (i = 0; i < this.width; i++) {
+    row[i] = 0;
+  }
+  // insert _height number of rows into _matrix
+  for (i = 0; i < this.height; i++) {
+    this.matrix[i] = row.slice(0);
+  }
+};
 
 /**
- * @namespace
+ * Place an object on the grid
+ *
+ * @param {string} pattern - Key of pattern to use.
+ * @param {number} x - The x-coordinate of the placement.
+ * @param {number} y - The y-coordinate of the placement.
  */
-var Life = (function () {
-  'use strict';
+Life.prototype.place = function (pattern, x, y) {
+  var schema = this.patterns[pattern];
 
-  var _width;             // width and height of grid in cells
-  var _height;
-  var _cell;              // size of cells in pixels
-  var _matrix = [];       // matrix of cell states
-  var _canvas;            // HTML canvas object
-  var _context;           // context of canvas object
-  var _cellColor;         // color of living cell
-  var _canvasColor;       // color of blank canvas
-  var _generation = 50;   // lifetime of  a generation in milliseconds
-  var _patterns = {};     // a library of patterns
-  var _intervalId = null; // interval id of generate function
-
-  /**
-   * Create a canvas object.
-   *
-   * @param {number} width  - The width of the canvas in pixels.
-   * @param {number} height - The height of the canvas in pixels.
-   * @param {number} cell   - The size of a cell in pixels.
-   * @param {string} color  - Color to use for living cells.
-   * @returns {Node} An HTML canvas node
-   */
-  function create(width, height, cell, cellColor, canvasColor) {
-    // set namespace variables
-    _width  = width / cell;
-    _height = height / cell;
-    _cell  = cell;
-    _cellColor = (typeof cellColor === 'undefined') ? '#000' : cellColor;
-    _canvasColor = (typeof canvasColor === 'undefined') ? '#fff' : canvasColor;
-
-    // create an HTML canvas element; note we're using the args
-    //   values here still since they're in pixels.
-    var canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    _canvas = canvas;
-    _context = canvas.getContext('2d');
-    _context.fillStyle = _canvasColor;
-    _context.fillRect(0, 0, 600, 450);
-    _context.fillStyle = _cellColor;
-
-    _initializeMatrix();
-    return _canvas;
+  for (var n = 0; n < schema.length; n++) {
+    for (var m = 0; m < schema[0].length; m++) {
+      this.matrix[n+y][m+x] = schema[n][m];
+    }
   }
+  this.draw();
+};
 
-  /**
-   * Place an object on the grid
-   *
-   * @param {string} pattern - Key of pattern to use.
-   * @param {number} x - The x-coordinate of the placement.
-   * @param {number} y - The y-coordinate of the placement.
-   */
-  function put(pattern, x, y) {
-    var schema = _patterns[pattern];
-    var height = schema.length;
-    var width = schema[0].length;
+/*
+ * Translate matrix onto the canvas.
+ */
+Life.prototype.draw = function () {
+  var m, n, x, y, currentValue;
+  var cell = this.cell;
+  var matrix = this.matrix;
+  var context = this.context;
 
-    for (var row = 0; row < height; row++) {
-      for (var col = 0; col < width; col++) {
-        _matrix[row+y][col+x] = schema[row][col];
+  for (n = 0; n < this.height; n++) {
+    for (m = 0; m < this.width; m++) {
+      x = m * cell;
+      y = n * cell;
+      currentValue = matrix[n][m];
+      if (currentValue === 1) {
+        context.fillRect(x, y, cell, cell);
       }
-    }
-    _draw();
-  }
-
-  /**
-   * Start iterating generations.
-   */
-  function start() {
-    _intervalId = setInterval(_generate, _generation);
-  }
-
-  /**
-   * Stop iterating generations.
-   */
-  function stop() {
-    clearInterval(_intervalId);
-    _intervalId = null;
-  }
-
-  /**
-   * @returns {boolean}
-   */
-  function isRunning() {
-    return _intervalId !== null;
-  }
-
-  /*
-   * Create the cell matrix.
-   *
-   * Sets _matrix to an n x m array with all values initialized to 0
-   */
-  function _initializeMatrix() {
-    var i;
-    // create a row of _width 0's
-    var row = [];
-    for (i = 0; i < _width; i++) {
-      row[i] = 0;
-    }
-    // insert _height number of rows into _matrix
-    for (i = 0; i < _height; i++) {
-      _matrix[i] = row.slice(0);
-    }
-  }
-
-  /*
-   * Translate _matrix onto the _canvas.
-   */
-  function _draw() {
-    var x, y, currentValue;
-    for (var row = 0; row < _height; row++) {
-      for (var col = 0; col < _width; col++) {
-        x = col * _cell;
-        y = row * _cell;
-        currentValue = _matrix[row][col];
-        if (currentValue === 1) {
-          _context.fillRect(x, y, _cell, _cell);
-        }
-        // if we're turning off a cell that's alive, then clear that
-        //   cell's rectangle, and set the cell's value to 0
-        else if (currentValue === -1) {
-          _context.clearRect(x, y, _cell, _cell);
-          _matrix[row][col] = 0;
-        }
+      // if we're turning off a cell that's alive, then clear that
+      //   cell's rectangle, and set the cell's value to 0
+      else if (currentValue === -1) {
+        context.clearRect(x, y, cell, cell);
+        matrix[n][m] = 0;
       }
     }
   }
+};
 
-  /*
-   * Compute the next generation.
-   */
-  function _generate() {
-    var row, col, neighbors;
-    var nextGen = _cloneMatrix();
+/*
+* Compute the next generation.
+*/
+Life.prototype.tick = function () {
+  var n, m, neighbors;
+  var nextGen = this.cloneMatrix();
 
-    for (row = 0; row < _height; row++) {
-      for (col = 0; col < _width; col++) {
-        neighbors = _countNeighbors(row, col);
+  for (n = 0; n < this.height; n++) {
+    for (m = 0; m < this.width; m++) {
+      neighbors = this.countNeighbors(n, m);
 
-        if (_matrix[row][col] === 1) {
-          // if it's a living cell that's going to die, then mark it
-          //   to be cleared for _draw
-          if (neighbors < 2 || neighbors > 3) {
-            nextGen[row][col] = -1;
-          }
-        }
-        else if (neighbors === 3) {
-          nextGen[row][col] = 1;
+      if (this.matrix[n][m] === 1) {
+        // if it's a living cell that's going to die, then mark it
+        //   to be cleared for draw()
+        if (neighbors < 2 || neighbors > 3) {
+          nextGen[n][m] = -1;
         }
       }
-    }
-    _matrix = nextGen;
-    _draw();
-  }
-
-  /*
-   * Produce a clone of the _matrix.
-   */
-  function _cloneMatrix() {
-    var retval = [];
-    for (var i = 0; i < _matrix.length; i++) {
-      retval[i] = _matrix[i].slice(0);
-    }
-    return retval;
-  }
-
-  /*
-   * Count the number of neighbors;
-   */
-  function _countNeighbors(row, col) {
-    // Don't want to count the current cell itself.
-    var pop = 0 - _matrix[row][col];
-    var i, j;
-
-    for (i = -1; i < 2; i++) {
-      for (j = -1; j < 2; j++) {
-        if (typeof _matrix[row+i] !== 'undefined' &&
-            typeof _matrix[row+i][col+j] !== 'undefined') {
-          pop += _matrix[row+i][col+j];
-        }
+      else if (neighbors === 3) {
+        nextGen[n][m] = 1;
       }
     }
-    return pop;
   }
+  this.matrix = nextGen;
+  this.draw();
+};
 
-  /*
-   * Some standard patterns.
-   * TODO add more
-   */
-  _patterns.blinker = [[ 1, 1, 1 ]];
-  _patterns.pulsar = [
-      [ 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0 ],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-      [ 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1 ],
-      [ 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1 ],
-      [ 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1 ],
-      [ 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0 ],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-      [ 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0 ],
-      [ 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1 ],
-      [ 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1 ],
-      [ 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1 ],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-      [ 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0 ],
-  ];
-  _patterns.glider = [
-      [ 0, 1, 0 ],
-      [ 0, 0, 1 ],
-      [ 1, 1, 1 ]
-  ];
-  _patterns.gosper = [
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
-      [ 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [ 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-  ];
+/*
+ * Produce a clone of the _matrix.
+ */
+Life.prototype.cloneMatrix = function () {
+  var retval = [];
+  for (var i = 0; i < this.matrix.length; i++) {
+    retval[i] = this.matrix[i].slice(0);
+  }
+  return retval;
+};
 
-  /*
-   * Expose the public API.
-   */
-  return {
-    create: create,
-    put: put,
-    start: start,
-    stop: stop,
-    isRunning: isRunning
-  };
-}());
+/*
+ * Count the number of neighbors;
+ */
+Life.prototype.countNeighbors = function (row, col) {
+  // Don't want to count the current cell itself.
+  var pop = 0 - this.matrix[row][col];
+  var i, j;
+
+  for (i = -1; i < 2; i++) {
+    for (j = -1; j < 2; j++) {
+      if (typeof this.matrix[row+i] !== 'undefined' &&
+          typeof this.matrix[row+i][col+j] !== 'undefined') {
+        pop += this.matrix[row+i][col+j];
+      }
+    }
+  }
+  return pop;
+};
+
+/**
+ * Start ticking generations.
+ */
+Life.prototype.start = function () {
+  console.log(this);
+  this.intervalId = setInterval(this.tick.bind(this), this.generation);
+};
+
+/**
+ * Stop iterating generations.
+ */
+Life.prototype.stop = function () {
+  clearInterval(this.intervalId);
+  this.intervalId = null;
+};
+
+/**
+ * @returns {boolean}
+ */
+Life.prototype.isRunning = function () {
+  return this.intervalId !== null;
+};
+
+/*
+ * Some standard patterns.
+ * TODO add more
+ */
+Life.prototype.patterns = {
+  blinker: [[ 1, 1, 1 ]],
+  pulsar: [
+    [ 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0 ],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    [ 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1 ],
+    [ 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1 ],
+    [ 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1 ],
+    [ 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0 ],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    [ 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0 ],
+    [ 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1 ],
+    [ 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1 ],
+    [ 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1 ],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    [ 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0 ] ],
+  glider: [
+    [ 0, 1, 0 ],
+    [ 0, 0, 1 ],
+    [ 1, 1, 1 ] ],
+  gosper: [
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
+    [ 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [ 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] ]
+};
 
