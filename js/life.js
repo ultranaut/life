@@ -7,14 +7,17 @@ var Life = (function () {
    * @param {number} width  - The width of the canvas in pixels.
    * @param {number} height - The height of the canvas in pixels.
    * @param {number} cell   - The size of a cell in pixels.
+   * @param {boolean} [wrap=true]  - Wrap the  canvas.
    * @returns {Node} An HTML canvas node
    */
-  function Life(width, height, cell) {
+  function Life(width, height, cell, wrap) {
     var self = this;
     // set instance properties
     this.width = width / cell;   // width and height of grid in cells
     this.height = height / cell;
     this.cell = cell;            // size of cells in pixels
+    this.wrap = typeof wrap === 'undefined' ? true : !!wrap;
+
     this.matrix = [];            // matrix of cell states
     this.generation = 50;        // lifetime of  a generation in milliseconds
     this.intervalId = null;      // interval id of _tick function
@@ -179,8 +182,11 @@ var Life = (function () {
 
     for (i = -1; i < 2; i++) {
       for (j = -1; j < 2; j++) {
-        if (typeof this.matrix[row+i] !== 'undefined' &&
-            typeof this.matrix[row+i][col+j] !== 'undefined') {
+        if (this.wrap === true) {
+          pop += this.matrix[(this.height+row+i) % this.height][(this.width+col+j) % this.width];
+        }
+        else if (typeof this.matrix[row+i] !== 'undefined' &&
+                 typeof this.matrix[row+i][col+j] !== 'undefined') {
           pop += this.matrix[row+i][col+j];
         }
       }

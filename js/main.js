@@ -3,7 +3,7 @@ var cellColor   = '#b58900';
 var graveColor  = '#586e75';
 var canvasColor = '#073642';
 
-var game = new Life(600, 450, 5);
+var game = new Life(600, 450, 5, false);
 game.setColor('cellColor', cellColor);
 game.setColor('canvasColor', canvasColor);
 game.place('glider', 13,  1);
