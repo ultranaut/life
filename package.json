@@ -1,0 +1,19 @@
+{
+  "name": "life",
+  "version": "0.5",
+  "description": "A quick toy problem project just for fun and to play around with stuff that I haven't made much use of.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ultranaut/life.git"
+  },
+  "author": "John Shearer <john@ultranaut.com> (http://ultranaut.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ultranaut/life/issues"
+  },
+  "homepage": "https://github.com/ultranaut/life#readme"
+}
