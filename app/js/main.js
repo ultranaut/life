@@ -1,6 +1,5 @@
 /* global Life */
 var cellColor   = '#b58900';
-var graveColor  = '#586e75';
 var canvasColor = '#073642';
 
 var game = new Life(600, 450, 5, false);
@@ -16,21 +15,8 @@ game.place('pulsar', 10, 67);
 document.getElementById('life').appendChild(game.canvas);
 game.canvas.style.backgroundColor = canvasColor;
 
-document.getElementById('showGraves').onchange = function (e) {
-  'use strict';
-  game.canvas.style.backgroundColor = this.checked ? graveColor : canvasColor;
-};
-
 document.getElementById('startBtn').onclick = function () {
   'use strict';
-  if (!game.isRunning()) {
-    game.start();
-    this.className = 'btn btn-danger';
-    this.innerHTML = 'Stop';
-  }
-  else {
-    game.stop();
-    this.className = 'btn btn-success';
-    this.innerHTML = 'Start';
-  }
+  this.innerHTML = game.isRunning() ? (game.stop(),  'Start')
+                                    : (game.start(), 'Stop');
 };
