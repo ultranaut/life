@@ -1,4 +1,3 @@
-/* global Life */
 var cellColor   = '#b58900';
 var canvasColor = '#073642';
 

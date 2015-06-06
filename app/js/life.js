@@ -1,5 +1,8 @@
-var Life = (function () {
+/* eslint no-use-before-define: 0 */
+(function () {
   'use strict';
+
+  var root = this;
 
   /**
    * Creates a Game of Life object.
@@ -11,7 +14,6 @@ var Life = (function () {
    * @returns {Node} An HTML canvas node
    */
   function Life(width, height, cell, wrap) {
-    var self = this;
     // set instance properties
     this.width = width / cell;   // width and height of grid in cells
     this.height = height / cell;
@@ -51,7 +53,7 @@ var Life = (function () {
 
     for (var n = 0; n < schema.length; n++) {
       for (var m = 0; m < schema[0].length; m++) {
-        this.matrix[n+y][m+x] = schema[n][m];
+        this.matrix[n + y][m + x] = schema[n][m];
       }
     }
     _draw.call(this);
@@ -183,11 +185,11 @@ var Life = (function () {
     for (i = -1; i < 2; i++) {
       for (j = -1; j < 2; j++) {
         if (this.wrap === true) {
-          pop += this.matrix[(this.height+row+i) % this.height][(this.width+col+j) % this.width];
+          pop += this.matrix[(this.height + row + i) % this.height][(this.width + col + j) % this.width];
         }
-        else if (typeof this.matrix[row+i] !== 'undefined' &&
-                 typeof this.matrix[row+i][col+j] !== 'undefined') {
-          pop += this.matrix[row+i][col+j];
+        else if (typeof this.matrix[row + i] !== 'undefined' &&
+                 typeof this.matrix[row + i][col + j] !== 'undefined') {
+          pop += this.matrix[row + i][col + j];
         }
       }
     }
@@ -236,6 +238,6 @@ var Life = (function () {
   };
 
 
-  return Life;
+  root.Life = Life;
 
-}());
+}).call(this);
