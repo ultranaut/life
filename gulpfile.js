@@ -2,6 +2,12 @@
 
 var gulp = require('gulp');
 var connect = require('gulp-connect');
+var plumber = require('gulp-plumber');
+
+var paths = {
+  html: './app/*.html',
+  js: './app/js/*.js'
+};
 
 gulp.task('connect', function () {
   connect.server({
@@ -12,14 +18,20 @@ gulp.task('connect', function () {
 });
 
 gulp.task('html', function () {
-  gulp.src('./app/*.html')
+  gulp.src(paths.html)
+      .pipe(plumber())
       .pipe(connect.reload());
 });
 
-
-gulp.task('watch', function () {
-  gulp.watch(['./app/*.html'], ['html'])
-      .watch(['./app/js/*.js'], ['js']);
+gulp.task('js', function () {
+  gulp.src(paths.js)
+      .pipe(plumber())
+      .pipe(connect.reload());
 });
 
-gulp.task('default', ['connect', 'watch', 'html']);
+gulp.task('watch', function () {
+  gulp.watch([paths.html], ['html']);
+  gulp.watch([paths.js], ['js']);
+});
+
+gulp.task('default', ['connect', 'html', 'js', 'watch']);
