@@ -3,6 +3,7 @@
 var gulp = require('gulp');
 var connect = require('gulp-connect');
 var plumber = require('gulp-plumber');
+var lint = require('gulp-eslint');
 
 var paths = {
   html: './app/*.html',
@@ -26,6 +27,8 @@ gulp.task('html', function () {
 gulp.task('js', function () {
   gulp.src(paths.js)
       .pipe(plumber())
+      .pipe(lint())
+      .pipe(lint.formatEach())
       .pipe(connect.reload());
 });
 
