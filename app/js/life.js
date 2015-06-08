@@ -7,42 +7,37 @@
   /**
    * Creates a Game of Life object.
    * @class
-   * @param {number} width  - The width of the canvas in pixels.
-   * @param {number} height - The height of the canvas in pixels.
-   * @param {number} cell   - The size of a cell in pixels.
+   * @param {number} width  - The number of columns.
+   * @param {number} height - The number of rows.
    * @param {boolean} [wrap=true]  - Wrap the  canvas.
-   * @returns {Node} An HTML canvas node
    */
-  function Life(width, height, cell, wrap) {
+  function Life(width, height, wrap) {
     // set instance properties
-    this.width = width / cell;   // width and height of grid in cells
-    this.height = height / cell;
-    this.cell = cell;            // size of cells in pixels
+    this.width = width;   // width and height of grid in cells
+    this.height = height;
     this.wrap = typeof wrap === 'undefined' ? true : !!wrap;
 
-    this.matrix = [];            // matrix of cell states
-    this.generation = 50;        // lifetime of  a generation in milliseconds
+    this.initializeMatrix();   // matrix of cell states
+    this.generation = 50;        // lifetime of a generation in milliseconds
     this.intervalId = null;      // interval id of _tick function
 
-    this.cellColor = '#000';
-    this.canvasColor = '#fff';
-
-    // create an HTML canvas element; note we're using the args
-    //   values here still since they're in pixels.
-    this.canvas = document.createElement('canvas');
-    this.canvas.width = width;
-    this.canvas.height = height;
-    this.context = this.canvas.getContext('2d');
-
-
-    _fillCanvas.call(this);
-    _initializeMatrix.call(this);
+    // _initializeMatrix.call(this);
   }
 
-  /* ********************** Public methods ************************* */
+  /*
+   * Create or reset the cell matrix.
+   *
+   * Sets _matrix to an n x m array with all values initialized to 0
+   */
+  Life.prototype.initializeMatrix = function () {
+    var starterRow = Array.apply(null, new Array(this.width))
+                          .map(function () { return 0; });
+    this.matrix = Array.apply(null, new Array(this.height))
+                       .map(function () { return starterRow.slice(0); });
+  };
 
   /**
-   * Place an object on the grid
+   * Place an object into the grid
    *
    * @param {string} pattern - Key of pattern to use.
    * @param {number} x - The x-coordinate of the placement.
@@ -56,21 +51,34 @@
         this.matrix[n + y][m + x] = schema[n][m];
       }
     }
-    _draw.call(this);
   };
 
-  Life.prototype.setColor = function (el, color) {
-    this[el] =  color;
-    if (el === 'canvasColor') {
-      _fillCanvas.call(this);
+  /*
+   * Generate the next, uhh, generation.
+   */
+  Life.prototype.step = function () {
+    var n, m, neighbors;
+    var nextGen = _cloneMatrix.call(this);
+
+    for (n = 0; n < this.height; n++) {
+      for (m = 0; m < this.width; m++) {
+        neighbors = _countNeighbors.call(this, n, m);
+        if (neighbors < 2 || neighbors > 3) {
+          nextGen[n][m] = 0;
+        }
+        else if (neighbors === 3) {
+          nextGen[n][m] = 1;
+        }
+      }
     }
+    this.matrix = nextGen;
   };
 
   /**
-   * Start _ticking generations.
+   * Start iterating generations.
    */
   Life.prototype.start = function () {
-    this.intervalId = setInterval(_tick.bind(this), this.generation);
+    this.intervalId = setInterval(this.step.bind(this), this.generation);
   };
 
   /**
@@ -88,80 +96,9 @@
     return this.intervalId !== null;
   };
 
+
   /* ********************* Private methods ************************ */
 
-  /*
-   * Create the cell matrix.
-   *
-   * Sets _matrix to an n x m array with all values initialized to 0
-   */
-  var _initializeMatrix = function () {
-    var i;
-    // create a row of _width 0's
-    var row = [];
-    for (i = 0; i < this.width; i++) {
-      row[i] = 0;
-    }
-    // insert _height number of rows into _matrix
-    for (i = 0; i < this.height; i++) {
-      this.matrix[i] = row.slice(0);
-    }
-  };
-
-  /*
-   * Translate matrix onto the canvas.
-   */
-  var _draw = function () {
-    var m, n, x, y, currentValue;
-    var cell = this.cell;
-    var matrix = this.matrix;
-    var context = this.context;
-
-    for (n = 0; n < this.height; n++) {
-      for (m = 0; m < this.width; m++) {
-        x = m * cell;
-        y = n * cell;
-        currentValue = matrix[n][m];
-        if (currentValue === 1) {
-          context.fillStyle = this.cellColor;
-          context.fillRect(x, y, cell, cell);
-        }
-        // if we're turning off a cell that's alive, then clear that
-        //   cell's rectangle, and set the cell's value to 0
-        else if (currentValue === -1) {
-          context.clearRect(x, y, cell, cell);
-          matrix[n][m] = 0;
-        }
-      }
-    }
-  };
-
-  /*
-   * Compute the next generation.
-   */
-  var _tick = function () {
-    var n, m, neighbors;
-    var nextGen = _cloneMatrix.call(this);
-
-    for (n = 0; n < this.height; n++) {
-      for (m = 0; m < this.width; m++) {
-        neighbors = _countNeighbors.call(this, n, m);
-
-        if (this.matrix[n][m] === 1) {
-          // if it's a living cell that's going to die, then mark it
-          //   to be cleared for _draw()
-          if (neighbors < 2 || neighbors > 3) {
-            nextGen[n][m] = -1;
-          }
-        }
-        else if (neighbors === 3) {
-          nextGen[n][m] = 1;
-        }
-      }
-    }
-    this.matrix = nextGen;
-    _draw.call(this);
-  };
 
   /*
    * Produce a clone of the _matrix.
@@ -196,14 +133,9 @@
     return pop;
   };
 
-  var _fillCanvas = function () {
-    this.context.fillStyle = this.canvasColor;
-    this.context.fillRect(0, 0, 600, 450);
-  };
-
   /*
    * Some standard patterns.
-   * TODO add more
+   * TODO break out into separate file
    */
   Life.prototype.patterns = {
     blinker: [[ 1, 1, 1 ]],
@@ -237,12 +169,14 @@
       [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] ]
   };
 
-  if (typeof exports !== 'undefined') {
-    if (typeof module !== 'undefined' && module.exports) {
-      exports = module.exports = Life;
-    }
-    exports.Life = Life;
-  } else {
+  /*
+   * Export as Node module if we're in that environment, otherwise add
+   * it as a global object
+   */
+  if (typeof module !== 'undefined' && module.exports) {
+    exports = module.exports = Life;
+  }
+  else {
     root.Life = Life;
   }
 
