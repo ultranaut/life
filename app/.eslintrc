@@ -3,7 +3,8 @@
     "browser": true
   },
   "globals":{
-    "Life": true
+    "Life": true,
+    "events": true
   },
   "rules": {
     "no-multi-spaces": 0,
