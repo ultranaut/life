@@ -30,7 +30,6 @@
     this.context = this.canvas.getContext('2d');
 
     _initializeMatrix.call(this);
-    // console.log(this.matrix);
   }
 
   Console.prototype.setColor = function (color) {
@@ -38,7 +37,6 @@
   };
 
   Console.prototype.refresh = function (data) {
-    // console.log(this.matrix);
     _draw.call(this, data);
     this.matrix = data;
   };
@@ -82,55 +80,10 @@
             context.clearRect(x, y, cell, cell);
           }
         }
-        // if (currentValue === 1) {
-        //   context.fillStyle = this.cellColor;
-        //   context.fillRect(x, y, cell, cell);
-        // }
-        // // if we're turning off a cell that's alive, then clear that
-        // else {
-        //   context.clearRect(x, y, cell, cell);
-        // }
       }
     }
   };
 
-  /*
-   * Compute the next generation.
-   */
-  var _tick = function () {
-    var n, m, neighbors;
-    var nextGen = _cloneMatrix.call(this);
-
-    for (n = 0; n < this.height; n++) {
-      for (m = 0; m < this.width; m++) {
-        neighbors = _countNeighbors.call(this, n, m);
-
-        if (this.matrix[n][m] === 1) {
-          // if it's a living cell that's going to die, then mark it
-          //   to be cleared for _draw()
-          if (neighbors < 2 || neighbors > 3) {
-            nextGen[n][m] = -1;
-          }
-        }
-        else if (neighbors === 3) {
-          nextGen[n][m] = 1;
-        }
-      }
-    }
-    this.matrix = nextGen;
-    _draw.call(this);
-  };
-
-  /*
-   * Produce a clone of the _matrix.
-   */
-  var _cloneMatrix = function () {
-    var retval = [];
-    for (var i = 0; i < this.matrix.length; i++) {
-      retval[i] = this.matrix[i].slice(0);
-    }
-    return retval;
-  };
 
   if (typeof exports !== 'undefined') {
     if (typeof module !== 'undefined' && module.exports) {

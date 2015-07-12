@@ -6,12 +6,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style type="text/css">
-    h1 { color: #073642; }
+    body {
+      background-color: #073642;
+      font-family: Incosolata,monospace;
+    }
+    #container {
+      width: 600px;
+      margin: 2em auto;
+    }
+    h1 {
+      color: #b58900;
+      font-weight: normal;
+      text-align: center;
+    }
+    ::selection  {
+      background: none;
+    }
+    ::-moz-selection {
+      background: none;
+    }
+    #life canvas { margin: 0 auto; display: block; }
+    #controls { display: none; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Life</h1>
+  <div id="container">
+    <h1>Life Invaders</h1>
     <div id="life"></div>
     <div id="controls">
       <button type="button" id="startBtn">Start</button>
