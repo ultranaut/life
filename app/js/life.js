@@ -4,6 +4,8 @@
 
   var root = this;
 
+  var events = {};
+
   /**
    * Creates a Game of Life object.
    * @class
@@ -17,10 +19,11 @@
     this.height = height;
     this.wrap = typeof wrap === 'undefined' ? true : !!wrap;
 
-    this.initializeMatrix();   // matrix of cell states
-    this.generation = 50;        // lifetime of a generation in milliseconds
-    this.intervalId = null;      // interval id of _tick function
+    this.matrix = null;       // matrix of cell states;
+    this.generation = 50;     // life of a generation in milliseconds
+    this.intervalId = null;   // interval id of start function
 
+    this.initializeMatrix();
     // _initializeMatrix.call(this);
   }
 
@@ -30,10 +33,12 @@
    * Sets _matrix to an n x m array with all values initialized to 0
    */
   Life.prototype.initializeMatrix = function () {
-    var starterRow = Array.apply(null, new Array(this.width))
-                          .map(function () { return 0; });
+    // creates an array of `width` 0's
+    var row = Array.apply(null, new Array(this.width))
+                   .map(function () { return 0; });
+    // creates and array of `height` rows
     this.matrix = Array.apply(null, new Array(this.height))
-                       .map(function () { return starterRow.slice(0); });
+                       .map(function () { return row.slice(0); });
   };
 
   /**
@@ -51,7 +56,21 @@
         this.matrix[n + y][m + x] = schema[n][m];
       }
     }
+    this.trigger('refresh', [this.matrix]);
   };
+
+  Life.prototype.on = function (event, fn) {
+    events[event] = events[event] || [];
+    events[event].push(fn);
+  };
+  Life.prototype.trigger = function (event, args) {
+    events[event] = events[event] || [];
+    args = args || [];
+    events[event].forEach(function (fn) {
+      fn.apply(this, args);
+    });
+  };
+
 
   /*
    * Generate the next, uhh, generation.
@@ -72,6 +91,8 @@
       }
     }
     this.matrix = nextGen;
+    this.trigger('refresh', [this.matrix]);
+    return this;
   };
 
   /**
@@ -98,7 +119,6 @@
 
 
   /* ********************* Private methods ************************ */
-
 
   /*
    * Produce a clone of the _matrix.

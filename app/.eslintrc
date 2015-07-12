@@ -4,6 +4,7 @@
   },
   "globals":{
     "Life": true,
+    "Console": true,
     "events": true
   },
   "rules": {
