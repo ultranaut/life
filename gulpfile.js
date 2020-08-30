@@ -45,4 +45,4 @@ gulp.task('watch', function () {
   gulp.watch([paths.tests], ['test']);
 });
 
-gulp.task('default', ['connect', 'html', 'js', 'test', 'watch']);
+gulp.task('default', gulp.series(['connect', 'html', 'js', 'test', 'watch']));
