@@ -7,14 +7,14 @@ var lint = require('gulp-eslint');
 var mocha = require('gulp-mocha');
 
 var paths = {
-  html: './app/*.html',
-  js: './app/js/*.js',
-  tests: './test/*Spec.js'
+  html: './src/*.html',
+  js: './src/js/*.js',
+  tests: './test/*Spec.js',
 };
 
 gulp.task('connect', function () {
   connect.server({
-    root: './app',
+    root: './src',
     port: 8000,
     livereload: true
   });

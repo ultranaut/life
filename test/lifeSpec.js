@@ -2,7 +2,7 @@
 'use strict';
 
 var expect = require('chai').expect;
-var Life = require('../app/js/life');
+var Life = require('../src/js/life');
 
 describe('Life', function () {
   var rows = 6;
