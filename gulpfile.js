@@ -16,27 +16,30 @@ gulp.task('connect', function () {
   connect.server({
     root: './src',
     port: 8000,
-    livereload: true
+    livereload: true,
   });
 });
 
 gulp.task('test', function () {
-  return gulp.src(paths.tests)
-             .pipe(mocha());
+  return gulp
+    .src(paths.tests)
+    .pipe(mocha());
 });
 
 gulp.task('html', function () {
-  gulp.src(paths.html)
-      .pipe(plumber())
-      .pipe(connect.reload());
+  gulp
+    .src(paths.html)
+    .pipe(plumber())
+    .pipe(connect.reload());
 });
 
 gulp.task('js', function () {
-  gulp.src(paths.js)
-      .pipe(plumber())
-      .pipe(lint())
-      .pipe(lint.formatEach())
-      .pipe(connect.reload());
+  gulp
+    .src(paths.js)
+    .pipe(plumber())
+    .pipe(lint())
+    .pipe(lint.formatEach())
+    .pipe(connect.reload());
 });
 
 gulp.task('watch', function () {

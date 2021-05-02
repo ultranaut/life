@@ -1,15 +1,13 @@
 'use strict';
 
-var cellColor   = '#b58900';
+var cellColor = '#b58900';
 var canvasColor = '#073642';
 
-var game = new Console(600, 450, 5);   // 120 x 90
+var game = new Console(600, 450, 5); // 120 x 90
 game.setColor(cellColor);
-
 
 document.getElementById('life').appendChild(game.canvas);
 game.canvas.style.backgroundColor = canvasColor;
-
 
 var life = new Life(120, 90, true);
 life.on('refresh', function (data) {
@@ -31,16 +29,14 @@ for (var i = 0; i < 7; i++) {
 }
 game.refresh(life.matrix);
 
-
 document.getElementsByTagName('startBtn').onclick = function () {
-  this.innerHTML = life.isRunning() ? (life.stop(),  'Start')
-                                    : (life.start(), 'Stop');
+  this.innerHTML = life.isRunning()
+    ? (life.stop(), 'Start')
+    : (life.start(), 'Stop');
 };
 
 document.getElementsByTagName('html')[0].onclick = function () {
-  life.isRunning() ? (life.stop(),  'Start')
-                                    : (life.start(), 'Stop');
+  life.isRunning() ? (life.stop(), 'Start') : (life.start(), 'Stop');
 };
 
 // document.getElementById('startBtn').innerHTML = (life.start(), 'Stop');
-

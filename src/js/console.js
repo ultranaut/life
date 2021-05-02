@@ -14,11 +14,11 @@
    */
   function Console(width, height, cellSize) {
     // set instance properties
-    this.width = width / cellSize;   // width and height of grid in cells
+    this.width = width / cellSize; // width and height of grid in cells
     this.height = height / cellSize;
-    this.cell = cellSize;            // size of cells in pixels
+    this.cell = cellSize; // size of cells in pixels
 
-    this.matrix = [];            // matrix of cell states
+    this.matrix = []; // matrix of cell states
 
     this.cellColor = '#000';
 
@@ -33,14 +33,13 @@
   }
 
   Console.prototype.setColor = function (color) {
-    this.cellColor =  color;
+    this.cellColor = color;
   };
 
   Console.prototype.refresh = function (data) {
     _draw.call(this, data);
     this.matrix = data;
   };
-
 
   /* ********************* Private methods ************************ */
 
@@ -50,10 +49,12 @@
    * Sets _matrix to an n x m array with all values initialized to 0
    */
   var _initializeMatrix = function () {
-    var starterRow = Array.apply(null, new Array(this.width))
-                          .map(function () { return 0; });
-    this.matrix = Array.apply(null, new Array(this.height))
-                       .map(function () { return starterRow.slice(0); });
+    var starterRow = Array.apply(null, new Array(this.width)).map(function () {
+      return 0;
+    });
+    this.matrix = Array.apply(null, new Array(this.height)).map(function () {
+      return starterRow.slice(0);
+    });
   };
 
   /*
@@ -75,15 +76,13 @@
           if (newValue === 1) {
             context.fillStyle = this.cellColor;
             context.fillRect(x, y, cell, cell);
-          }
-          else {
+          } else {
             context.clearRect(x, y, cell, cell);
           }
         }
       }
     }
   };
-
 
   if (typeof exports !== 'undefined') {
     if (typeof module !== 'undefined' && module.exports) {
@@ -93,5 +92,4 @@
   } else {
     root.Console = Console;
   }
-
-}).call(this);
+}.call(this));
