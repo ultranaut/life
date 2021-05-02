@@ -4,12 +4,10 @@ var gulp = require('gulp');
 var connect = require('gulp-connect');
 var plumber = require('gulp-plumber');
 var lint = require('gulp-eslint');
-var mocha = require('gulp-mocha');
 
 var paths = {
   html: './src/*.html',
   js: './src/js/*.js',
-  tests: './test/*Spec.js',
 };
 
 gulp.task('connect', function () {
@@ -20,17 +18,8 @@ gulp.task('connect', function () {
   });
 });
 
-gulp.task('test', function () {
-  return gulp
-    .src(paths.tests)
-    .pipe(mocha());
-});
-
 gulp.task('html', function () {
-  gulp
-    .src(paths.html)
-    .pipe(plumber())
-    .pipe(connect.reload());
+  gulp.src(paths.html).pipe(plumber()).pipe(connect.reload());
 });
 
 gulp.task('js', function () {
@@ -44,8 +33,7 @@ gulp.task('js', function () {
 
 gulp.task('watch', function () {
   gulp.watch([paths.html], ['html']);
-  gulp.watch([paths.js], ['test', 'js']);
-  gulp.watch([paths.tests], ['test']);
+  gulp.watch([paths.js], ['js']);
 });
 
-gulp.task('default', gulp.series(['connect', 'html', 'js', 'test', 'watch']));
+gulp.task('default', gulp.series(['connect', 'html', 'js', 'watch']));
