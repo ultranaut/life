@@ -4,6 +4,7 @@
   "description": "A quick toy problem project just for fun and to play around with stuff that I haven't made much use of.",
   "main": "index.js",
   "scripts": {
+    "start": "webpack serve",
     "test": "mocha"
   },
   "repository": {
@@ -23,6 +24,10 @@
     "gulp-connect": "^5.7.0",
     "gulp-eslint": "^6.0.0",
     "gulp-plumber": "^1.2.1",
-    "mocha": "^8.3.2"
+    "html-webpack-plugin": "^5.3.1",
+    "mocha": "^8.3.2",
+    "webpack": "^5.36.2",
+    "webpack-cli": "^4.6.0",
+    "webpack-dev-server": "^3.11.2"
   }
 }
