@@ -18,6 +18,9 @@
   },
   "homepage": "https://github.com/ultranaut/life#readme",
   "devDependencies": {
+    "@babel/core": "^7.14.0",
+    "@babel/preset-env": "^7.14.0",
+    "babel-loader": "^8.2.2",
     "chai": "^4.2.0",
     "eslint": "^7.25.0",
     "gulp": "^4.0.2",
