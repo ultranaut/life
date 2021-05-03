@@ -1,16 +1,16 @@
 import Console from './console.js';
 import Life from './life.js';
 
-var cellColor = '#b58900';
-var canvasColor = '#073642';
+const cellColor = '#b58900';
+const canvasColor = '#073642';
 
-var game = new Console(600, 450, 5); // 120 x 90
+const game = new Console(600, 450, 5); // 120 x 90
 game.setColor(cellColor);
 
 document.getElementById('life').appendChild(game.canvas);
 game.canvas.style.backgroundColor = canvasColor;
 
-var life = new Life(120, 90, true);
+const life = new Life(120, 90, true);
 life.on('refresh', function (data) {
   game.refresh(data);
 });
@@ -20,10 +20,10 @@ life.on('refresh', function (data) {
 // life.place('gosper', 78, 45);
 // life.place('gosper', 73, 10);
 // life.place('pulsar', 10, 67);
-for (var i = 0; i < 7; i++) {
-  for (var j = 0; j < 7; j++) {
-    var x = 15 + j * 13;
-    var y = 15 + i * 7;
+for (let i = 0; i < 7; i++) {
+  for (let j = 0; j < 7; j++) {
+    const x = 15 + j * 13;
+    const y = 15 + i * 7;
 
     life.place('alien', x, y);
   }
