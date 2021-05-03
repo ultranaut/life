@@ -1,4 +1,5 @@
-'use strict';
+import Console from './console.js';
+import Life from './life.js';
 
 var cellColor = '#b58900';
 var canvasColor = '#073642';
