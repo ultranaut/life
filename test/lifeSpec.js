@@ -1,15 +1,14 @@
-/* global describe, it */
-'use strict';
+/* eslint-env node, mocha */
 
-var expect = require('chai').expect;
-var Life = require('../src/js/life');
+const expect = require('chai').expect;
+const Life = require('../src/js/life');
 
 describe('Life', function () {
-  var rows = 6;
-  var cols = 6;
-  var life = new Life(cols, rows);
-  var matrix = life.matrix;
-  var lastRow = matrix[rows - 1];
+  const rows = 6;
+  const cols = 6;
+  const life = new Life(cols, rows);
+  const matrix = life.matrix;
+  const lastRow = matrix[rows - 1];
   // it('should return a Life object', function () {
   //   expect(life).to.be.an.instanceOf(Life);
   // });
